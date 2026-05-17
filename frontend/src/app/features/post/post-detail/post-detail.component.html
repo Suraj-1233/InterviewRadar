@@ -43,14 +43,14 @@
                             [style.background]="voteStatus.userVote === 'Upvote' ? 'var(--bg-active)' : 'transparent'"
                             [style.fontWeight]="voteStatus.userVote === 'Upvote' ? '700' : '500'"
                             style="display:flex;align-items:center;gap:7px;padding:8px 16px;border:none;cursor:pointer;font-size:0.875rem;color:var(--text-meta);transition:background var(--dur-fast);">
-                      {{voteStatus.upvotes}}
+                      Like ({{voteStatus.upvotes}})
                     </button>
                     <div style="width:1px;height:24px;background:var(--border);"></div>
                     <button (click)="vote('Downvote')"
                             [style.background]="voteStatus.userVote === 'Downvote' ? 'var(--bg-active)' : 'transparent'"
                             [style.fontWeight]="voteStatus.userVote === 'Downvote' ? '700' : '500'"
                             style="display:flex;align-items:center;gap:7px;padding:8px 16px;border:none;cursor:pointer;font-size:0.875rem;color:var(--text-meta);transition:background var(--dur-fast);">
-                      Downvote
+                      Dislike ({{voteStatus.downvotes}})
                     </button>
                   </div>
 
