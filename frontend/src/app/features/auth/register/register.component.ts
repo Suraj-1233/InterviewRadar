@@ -8,69 +8,8 @@ import { AuthService } from '../../../core/services/auth.service';
   selector: 'app-register',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  template: `
-    <div class="auth-page">
-      <div class="auth-card animate-fade-up">
-
-        <!-- Logo -->
-        <a routerLink="/" class="auth-logo">
-          <div class="auth-logo-icon">📡</div>
-          <span class="auth-logo-text">InterviewRadar</span>
-        </a>
-
-        <h1 class="auth-title">Create account</h1>
-        <p class="auth-subtitle">Join thousands sharing their interview experiences</p>
-
-        <form #regForm="ngForm" (ngSubmit)="onSubmit(regForm)" novalidate style="display:flex;flex-direction:column;gap:1.125rem;">
-
-          <div class="input-group">
-            <label class="input-label">Full name</label>
-            <input type="text" name="fullName" ngModel required
-                   class="input-field"
-                   placeholder="John Doe">
-          </div>
-
-          <div class="input-group">
-            <label class="input-label">Username</label>
-            <input type="text" name="username" ngModel required minlength="3" maxlength="30"
-                   class="input-field"
-                   placeholder="john_radar">
-            <p *ngIf="regForm.submitted && regForm.controls['username']?.invalid"
-               style="color:var(--red);font-size:0.8125rem;margin-top:4px;">Username must be 3–30 characters</p>
-          </div>
-
-          <div class="input-group">
-            <label class="input-label">Email address</label>
-            <input type="email" name="email" ngModel required email
-                   class="input-field"
-                   placeholder="you@example.com">
-          </div>
-
-          <div class="input-group">
-            <label class="input-label">Password</label>
-            <input type="password" name="password" ngModel required minlength="6"
-                   class="input-field"
-                   placeholder="At least 6 characters">
-          </div>
-
-          <div *ngIf="errorMsg" class="auth-error">{{errorMsg}}</div>
-
-          <button type="submit" class="btn btn-primary btn-lg" [disabled]="loading"
-                  style="width:100%;margin-top:0.5rem;">
-            {{ loading ? 'Creating account…' : 'Create Account' }}
-          </button>
-
-        </form>
-
-        <hr class="auth-divider">
-        <p class="auth-footer">
-          Already have an account?
-          <a routerLink="/login" style="margin-left:4px;">Sign in</a>
-        </p>
-
-      </div>
-    </div>
-  `
+  templateUrl: './register.component.html',
+  styleUrl: './register.component.css'
 })
 export class RegisterComponent {
   private auth   = inject(AuthService);

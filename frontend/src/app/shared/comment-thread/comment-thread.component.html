@@ -1,0 +1,71 @@
+    <div style="display:flex; flex-direction:column; gap:1.5rem;">
+      <div *ngFor="let comment of comments" style="position:relative;">
+        
+        <div style="display:flex; gap:14px;">
+          <!-- Avatar -->
+          <div style="width:36px;height:36px;border-radius:var(--radius-full);background:var(--bg-active);border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:600;color:var(--text-display);z-index:2;">
+            {{ comment.anonymous ? '?' : (comment.authorName ? comment.authorName.charAt(0).toUpperCase() : '') }}
+          </div>
+
+          <div style="flex:1;min-width:0;">
+            <!-- Author + Time -->
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <span style="font-size:0.875rem;font-weight:600;color:var(--text-display);" [class.italic]="comment.anonymous">
+                {{ comment.authorName }}
+              </span>
+              <span style="color:var(--text-meta);font-size:0.75rem;">•</span>
+              <span style="color:var(--text-meta);font-size:0.75rem;font-weight:500;">{{ comment.createdAt | date:'mediumDate' }}</span>
+            </div>
+
+            <!-- Content -->
+            <div style="font-size:0.9375rem;color:var(--text-body);line-height:1.6;background:var(--bg-hover);padding:12px 16px;border-radius:var(--radius-lg);border:1px solid transparent;transition:border-color var(--dur-base);"
+                 onmouseenter="this.style.borderColor='var(--border-hover)'"
+                 onmouseleave="this.style.borderColor='transparent'">
+              {{ comment.content }}
+            </div>
+
+            <!-- Actions -->
+            <div style="display:flex;align-items:center;gap:16px;margin-top:10px;">
+              <button (click)="onLike(comment.id)"
+                      style="display:flex;align-items:center;gap:6px;font-size:0.8125rem;font-weight:600;background:none;border:none;cursor:pointer;transition:color var(--dur-fast);"
+                      [style.color]="commentService.likedCommentIds.has(comment.id) ? 'var(--accent)' : 'var(--text-meta)'"
+                      onmouseenter="if(!this.style.color.includes('var(--accent)')) this.style.color='var(--text-display)'"
+                      onmouseleave="if(!this.style.color.includes('var(--accent)')) this.style.color='var(--text-meta)'">
+                <span>Like</span> {{ comment.likeCount }}
+              </button>
+              <button (click)="startReply(comment)"
+                      style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-meta);background:none;border:none;cursor:pointer;transition:color var(--dur-fast);"
+                      onmouseenter="this.style.color='var(--text-display)'"
+                      onmouseleave="this.style.color='var(--text-meta)'">
+                Reply
+              </button>
+            </div>
+
+            <!-- Inline Reply Form -->
+            <div *ngIf="replyingTo === comment.id" class="animate-fade-in" style="display:flex;gap:10px;margin-top:12px;">
+              <input [(ngModel)]="replyContent"
+                     placeholder="Write a helpful reply..."
+                     class="input-field" style="flex:1;padding:8px 12px;">
+              <button (click)="submitReply(comment.id)" class="btn btn-primary btn-sm">
+                Reply
+              </button>
+              <button (click)="cancelReply()" class="btn btn-ghost btn-sm">
+                Cancel
+              </button>
+            </div>
+
+            <!-- Nested Replies (recursive) -->
+            <div *ngIf="comment.replies && comment.replies.length > 0" style="margin-top:1.5rem; margin-left:14px; position:relative;">
+              <!-- Hierarchy Line -->
+              <div style="position:absolute;left:-28px;top:0;bottom:0;width:2px;background:var(--border);border-radius:2px;"></div>
+              
+              <app-comment-thread
+                [comments]="comment.replies"
+                (reply)="reply.emit($event)"
+                (like)="like.emit($event)">
+              </app-comment-thread>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

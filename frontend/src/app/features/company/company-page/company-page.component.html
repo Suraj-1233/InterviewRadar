@@ -1,0 +1,169 @@
+    <app-nav></app-nav>
+    <div class="page-wrapper">
+      <div class="container" style="padding-top:2.5rem;padding-bottom:4rem;">
+
+        <!-- Loading -->
+        <div *ngIf="loading">
+          <div style="display:flex;flex-direction:column;gap:1.25rem;max-width:900px;">
+            <div class="skeleton" style="height:200px;border-radius:var(--r-xl); text-align: center;"></div>
+            <div class="skeleton" style="height:400px;border-radius:var(--r-xl); text-align: center;"></div>
+          </div>
+        </div>
+
+        <div *ngIf="!loading && company" class="animate-fade-up">
+
+          <!-- Hero Card -->
+          <div class="card" style="padding:2.5rem;margin-bottom:1.5rem;">
+            <div style="display:flex;align-items:flex-start;gap:1.5rem;flex-wrap:wrap;">
+
+              <!-- Initial circle -->
+              <div style="width:72px;height:72px;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--indigo));display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:#fff;box-shadow:0 8px 24px var(--accent-glow);flex-shrink:0;">
+                {{company.name.charAt(0).toUpperCase()}}
+              </div>
+
+              <!-- Info -->
+              <div style="flex:1;min-width:200px;">
+                <h1 style="font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--text);letter-spacing:-0.04em;margin-bottom:6px;">
+                  {{company.name}}
+                </h1>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
+                  <span *ngIf="company.industry" class="badge badge-indigo">{{company.industry}}</span>
+                  <span *ngIf="company.headquarters" style="font-size:0.875rem;color:var(--text-3);display:flex;align-items:center;gap:5px;">
+                    <span>Headquarters:</span> {{company.headquarters}}
+                  </span>
+                </div>
+                <p *ngIf="company.description" style="font-size:1rem;color:var(--text-2);line-height:1.65;max-width:680px;">{{company.description}}</p>
+              </div>
+
+              <!-- CTA -->
+              <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
+                <a *ngIf="company.websiteUrl" [href]="company.websiteUrl" target="_blank" class="btn btn-ghost btn-sm">
+                  Visit Website ↗
+                </a>
+                <a routerLink="/post/create" class="btn btn-primary btn-sm">
+                  + Share Experience
+                </a>
+              </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2rem;padding-top:2rem;border-top:1px solid var(--border);">
+              <div *ngFor="let stat of companyStats" style="text-align:center;">
+                <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--text);letter-spacing:-0.02em;">{{stat.value}}</div>
+                <div style="font-size:0.8125rem;color:var(--text-3);margin-top:2px;">{{stat.label}}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Content Grid -->
+          <div style="display:grid;grid-template-columns:1fr 300px;gap:1.5rem;">
+
+            <!-- Posts List -->
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+                <h2 style="font-family:var(--font-display);font-size:1.25rem;font-weight:700;color:var(--text);">
+                  Interview Experiences
+                </h2>
+                <span style="font-size:0.8125rem;color:var(--text-3);">{{postService.posts().length}} posts</span>
+              </div>
+
+              <div *ngIf="postService.loading()">
+                <div style="display:flex;flex-direction:column;gap:1rem;">
+                  <div *ngFor="let i of [1,2,3]" class="card" style="padding:1.5rem;">
+                    <div style="display:flex;gap:12px;margin-bottom:12px;">
+                      <div class="skeleton" style="width:40px;height:40px;border-radius:10px;flex-shrink:0;"></div>
+                      <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+                        <div class="skeleton" style="height:16px;width:70%;"></div>
+                        <div class="skeleton" style="height:12px;width:40%;"></div>
+                      </div>
+                    </div>
+                    <div class="skeleton" style="height:12px;margin-bottom:8px;"></div>
+                    <div class="skeleton" style="height:12px;width:85%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="!postService.loading() && postService.posts().length === 0" class="card" style="padding:3rem;text-align:center;">
+                <p style="color:var(--text-3);">No experiences yet for {{company.name}}.</p>
+                <a routerLink="/post/create" class="btn btn-primary btn-sm" style="margin-top:1rem;display:inline-flex;">
+                  Be the first to share!
+                </a>
+              </div>
+
+              <div *ngIf="!postService.loading() && postService.posts().length > 0" style="display:flex;flex-direction:column;gap:1rem;">
+                <article *ngFor="let post of postService.posts()" [routerLink]="['/post', post.id]" class="card card-interactive" style="padding:1.5rem;">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:10px;">
+                    <div style="min-width:0;">
+                      <h3 style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:4px;">
+                        {{post.title}}
+                      </h3>
+                      <div style="display:flex;align-items:center;gap:6px;font-size:0.8125rem;color:var(--text-3);flex-wrap:wrap;">
+                        <span [style.fontStyle]="post.anonymous ? 'italic' : ''" style="color:var(--text-2);">{{post.authorName}}</span>
+                        <span>·</span>
+                        <span>{{post.createdAt | date:'MMM d, y'}}</span>
+                      </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
+                      <span *ngIf="post.result" class="badge"
+                            [class.badge-green]="post.result === 'Selected'"
+                            [class.badge-red]="post.result === 'Rejected'"
+                            [class.badge-amber]="post.result === 'Pending' || post.result === 'Waitlisted'">
+                        {{post.result}}
+                      </span>
+                      <span *ngIf="post.difficulty" class="badge"
+                            [class.badge-green]="post.difficulty === 'Easy'"
+                            [class.badge-amber]="post.difficulty === 'Medium'"
+                            [class.badge-red]="post.difficulty === 'Hard'">
+                        {{post.difficulty}}
+                      </span>
+                    </div>
+                  </div>
+                  <p class="line-clamp-2" style="font-size:0.9rem;color:var(--text-3);line-height:1.6;">{{post.content}}</p>
+                  <span *ngIf="post.role" style="display:flex;align-items:center;gap:6px;font-size:0.8125rem;color:var(--text-3);margin-top:10px;">
+                    {{post.role}}
+                  </span>
+                </article>
+              </div>
+            </div>
+
+            <!-- Side Info -->
+            <aside style="display:flex;flex-direction:column;gap:1.25rem;position:sticky;top:88px;align-self:start;">
+
+              <!-- Result Breakdown -->
+              <div class="card" style="padding:1.25rem;">
+                <p class="sidebar-section-title" style="margin-bottom:1rem;">Result Breakdown</p>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <div *ngFor="let r of resultBreakdown" style="display:flex;align-items:center;justify-content:space-between;">
+                    <div style="display:flex;align-items:center;gap:8px;font-size:0.875rem;color:var(--text-2);">
+                      {{r.label}}
+                    </div>
+                    <span class="badge"
+                          [class.badge-green]="r.label === 'Selected'"
+                          [class.badge-red]="r.label === 'Rejected'"
+                          [class.badge-amber]="r.label === 'Other'">
+                      {{r.count}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Common Roles -->
+              <div class="card" style="padding:1.25rem;">
+                <p class="sidebar-section-title" style="margin-bottom:1rem;">Common Roles</p>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                  <span *ngFor="let role of commonRoles" class="badge badge-purple">{{role}}</span>
+                </div>
+              </div>
+
+            </aside>
+          </div>
+
+        </div>
+
+        <div *ngIf="!company && !loading" style="text-align:center;padding:6rem 0;">
+          <h2 style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--text);margin-bottom:0.5rem;">Company not found</h2>
+          <a routerLink="/" class="btn btn-ghost" style="margin-top:1rem;">← Back to Feed</a>
+        </div>
+
+      </div>
+    </div>
