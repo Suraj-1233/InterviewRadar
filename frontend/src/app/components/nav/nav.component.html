@@ -1,0 +1,43 @@
+    <nav class="navbar">
+      <div class="navbar-inner">
+
+        <!-- Logo -->
+        <a routerLink="/" class="navbar-logo">
+          <span>InterviewRadar</span>
+        </a>
+
+        <!-- Search -->
+        <div class="navbar-search">
+          <div class="search-box">
+            <input class="search-input" [(ngModel)]="searchQuery"
+                   (keyup.enter)="doSearch()"
+                   type="text"
+                   placeholder="Search companies, roles...">
+          </div>
+        </div>
+
+        <!-- Right Nav -->
+        <div class="navbar-right">
+          <a routerLink="/" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active" class="nav-link">Feed</a>
+          <a routerLink="/explore" routerLinkActive="active" class="nav-link">Explore</a>
+
+          <div *ngIf="auth.isLoggedIn()" style="display:contents;">
+            <a routerLink="/profile" routerLinkActive="active" class="nav-link flex items-center gap-2">
+              <div class="avatar-circle">
+                {{auth.currentUser()?.username?.charAt(0)?.toUpperCase()}}
+              </div>
+              <span style="max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:inline-block; vertical-align:middle;">
+                {{auth.currentUser()?.username}}
+              </span>
+            </a>
+            <a *ngIf="auth.isAdmin()" routerLink="/admin" class="nav-link">Admin</a>
+            <button (click)="auth.logout()" class="btn btn-ghost btn-sm">Sign Out</button>
+          </div>
+          <div *ngIf="!auth.isLoggedIn()" style="display:contents;">
+            <a routerLink="/login"    class="nav-link">Login</a>
+            <a routerLink="/register" class="btn btn-primary btn-sm">Sign Up</a>
+          </div>
+        </div>
+
+      </div>
+    </nav>

@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/interviewradar
+    username: postgres
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8080
+
+app:
+  jwt:
+    secret: interviewradar_super_secret_key_minimum_256_bits_long_change_in_prod
+    expiry-ms: 86400000   # 24 hours
+
+logging:
+  level:
+    org.springframework.security: DEBUG

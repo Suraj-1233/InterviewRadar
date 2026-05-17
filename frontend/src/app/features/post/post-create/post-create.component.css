@@ -1,0 +1,4 @@
+    .pb-16 { padding-bottom: var(--space-16); }
+    .mb-6 { margin-bottom: var(--space-6); }
+    .w-fit { width: fit-content; }
+    .font-semibold { font-weight: 600; }

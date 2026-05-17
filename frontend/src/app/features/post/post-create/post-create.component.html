@@ -1,0 +1,163 @@
+    <app-nav></app-nav>
+    <div class="page-wrapper">
+      <div class="container pb-16">
+
+        <!-- Back -->
+        <a routerLink="/" class="btn btn-ghost btn-sm mb-6 w-fit">
+          Back to Feed
+        </a>
+
+        <div class="animate-slide-up">
+          <h1 class="text-display mb-2">Share Your Experience</h1>
+          <p class="text-body-large text-meta mb-8">Help others by documenting your interview journey</p>
+
+          <div class="card p-8">
+            <form (ngSubmit)="onSubmit()" class="form-layout">
+
+              <!-- Post Type -->
+              <div class="input-group">
+                <label class="input-label">Post Type</label>
+                <div class="form-row form-row-2 mt-2">
+                  <div *ngFor="let t of postTypes"
+                       (click)="form.type = $any(t.value)"
+                       class="selectable-card"
+                       [class.selected]="form.type === t.value">
+                    <div class="selectable-card-content">
+                      <div class="selectable-card-title">{{t.label}}</div>
+                      <div class="selectable-card-desc">{{t.desc}}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Title -->
+              <div class="input-group">
+                <label class="input-label">Title <span style="color:var(--error); margin-left:4px;">*</span></label>
+                <input [(ngModel)]="form.title" name="title" type="text" required
+                       class="input-field"
+                       placeholder="e.g. Google SDE-2 Interview Experience – 2024">
+              </div>
+
+              <!-- Company + Role Row -->
+              <div class="form-row form-row-2">
+                <div class="input-group">
+                  <label class="input-label">Company</label>
+                  <div class="select-wrapper">
+                    <select [(ngModel)]="form.companyId" name="companyId" class="input-field">
+                      <option value="">Select company…</option>
+                      <option *ngFor="let c of companyService.companies()" [value]="c.id">{{c.name}}</option>
+                      <option value="other">Other (Add Custom Company)</option>
+                    </select>
+                  </div>
+                  <input *ngIf="form.companyId === 'other'"
+                         [(ngModel)]="customCompany"
+                         name="customCompany"
+                         type="text"
+                         class="input-field mt-2"
+                         placeholder="Enter custom company name..."
+                         style="margin-top: 8px;"
+                         aria-label="Custom Company Name">
+                </div>
+                <div class="input-group">
+                  <label class="input-label">Role / Position</label>
+                  <input [(ngModel)]="form.role" name="role" type="text" class="input-field" placeholder="e.g. SDE-2, Data Scientist">
+                </div>
+              </div>
+
+              <!-- Difficulty + Result Row -->
+              <div class="form-row form-row-3">
+                <div class="input-group">
+                  <label class="input-label">Difficulty</label>
+                  <div class="select-wrapper">
+                    <select [(ngModel)]="form.difficulty" name="difficulty" class="input-field">
+                      <option value="">Select…</option>
+                      <option value="Easy">Easy</option>
+                      <option value="Medium">Medium</option>
+                      <option value="Hard">Hard</option>
+                      <option value="other">Other (Add Custom Difficulty)</option>
+                    </select>
+                  </div>
+                  <input *ngIf="form.difficulty === 'other'"
+                         [(ngModel)]="customDifficulty"
+                         name="customDifficulty"
+                         type="text"
+                         class="input-field mt-2"
+                         placeholder="Enter custom difficulty (e.g. Extreme)..."
+                         style="margin-top: 8px;"
+                         aria-label="Custom Difficulty Level">
+                </div>
+                <div class="input-group">
+                  <label class="input-label">Result</label>
+                  <div class="select-wrapper">
+                    <select [(ngModel)]="form.result" name="result" class="input-field">
+                      <option value="">Select…</option>
+                      <option value="Selected">Selected</option>
+                      <option value="Rejected">Rejected</option>
+                      <option value="Waitlisted">Waitlisted</option>
+                      <option value="Pending">Pending</option>
+                      <option value="other">Other (Add Custom Result)</option>
+                    </select>
+                  </div>
+                  <input *ngIf="form.result === 'other'"
+                         [(ngModel)]="customResult"
+                         name="customResult"
+                         type="text"
+                         class="input-field mt-2"
+                         placeholder="Enter custom result (e.g. Offered but Declined)..."
+                         style="margin-top: 8px;"
+                         aria-label="Custom Interview Result">
+                </div>
+                <div class="input-group">
+                  <label class="input-label">Location</label>
+                  <input [(ngModel)]="form.location" name="location" type="text" class="input-field" placeholder="e.g. Bengaluru">
+                </div>
+              </div>
+
+              <!-- Salary -->
+              <div class="input-group">
+                <label class="input-label">Package / Salary (optional)</label>
+                <input [(ngModel)]="form.salaryPackage" name="salaryPackage" type="number" class="input-field" placeholder="e.g. 3500000">
+              </div>
+              
+              <!-- Content -->
+              <div class="input-group">
+                <label class="input-label">Your Experience <span style="color:var(--error); margin-left:4px;">*</span></label>
+                <textarea [(ngModel)]="form.content" name="content" required
+                          class="input-field"
+                          placeholder="Describe your interview process step by step. Include rounds, questions asked, preparation tips, and anything else that would help others…"></textarea>
+                <p class="text-xs text-meta mt-2">{{form.content?.length || 0}} characters</p>
+              </div>
+
+              <!-- Anonymous Toggle -->
+              <div class="card p-4 flex items-center justify-between mt-2">
+                <div class="flex-col gap-1">
+                  <div class="text-sm font-semibold">Post Anonymously</div>
+                  <div class="text-xs text-meta">Your name won't be shown publicly</div>
+                </div>
+                <div class="toggle-switch" 
+                     [class.active]="form.anonymous" 
+                     (click)="form.anonymous = !form.anonymous">
+                  <div class="toggle-switch-thumb"></div>
+                </div>
+              </div>
+
+              <!-- Error -->
+              <div *ngIf="errorMsg" class="form-error">{{errorMsg}}</div>
+
+              <div class="divider"></div>
+
+              <!-- Actions -->
+              <div class="flex items-center justify-end gap-3">
+                <button type="button" (click)="saveDraft()" class="btn btn-ghost" [disabled]="submitting">
+                  Save Draft
+                </button>
+                <button type="submit" class="btn btn-primary btn-lg flex-1" [disabled]="submitting || !form.title || !form.content">
+                  {{submitting ? 'Publishing…' : 'Publish Experience'}}
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>

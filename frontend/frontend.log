@@ -1,0 +1,29 @@
+
+> interview-radar-frontend@0.0.0 start
+> ng serve --host 0.0.0.0 --port 4201
+
+
+Warning: This is a simple server for use in testing or debugging Angular applications
+locally. It hasn't been reviewed for security issues.
+
+Binding this server to an open connection can result in compromising your application or
+computer. Using a different host than the one passed to the "--host" flag might result in
+websocket connection issues.
+    
+/Users/surajkannujiya/Desktop/Expriment/InterviewRadar/frontend/node_modules/rxjs/dist/cjs/internal/util/reportUnhandledError.js:13
+            throw err;
+            ^
+
+Error: listen EPERM: operation not permitted 0.0.0.0:4201
+    at Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    at listenInCluster (node:net:1997:12)
+    at node:net:2206:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EPERM',
+  errno: -1,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 4201
+}
+
+Node.js v24.2.0

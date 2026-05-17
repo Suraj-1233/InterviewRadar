@@ -1,0 +1,119 @@
+    <app-nav></app-nav>
+    <div class="page-wrapper">
+      <div class="container" style="max-width:900px;padding-top:2.5rem;padding-bottom:4rem;">
+
+        <!-- Search Header -->
+        <div class="animate-fade-up" style="margin-bottom:2rem;">
+          <div style="position:relative;max-width:640px;">
+            <input [(ngModel)]="query" (input)="onSearch()" type="text"
+                   class="input-field"
+                   style="padding-left:52px;font-size:1.125rem;height:56px;"
+                   placeholder="Search companies, roles, experiences…">
+          </div>
+          <p style="font-size:0.9rem;color:var(--text-3);margin-top:0.75rem;">
+            <span *ngIf="query">
+              Showing results for <strong style="color:var(--text);">"{{query}}"</strong>
+              — {{filteredPosts.length}} found
+            </span>
+            <span *ngIf="!query">
+              Start typing to search
+            </span>
+          </p>
+        </div>
+
+        <!-- Filters Bar -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.5rem;">
+          <button *ngFor="let f of filters"
+                  (click)="activeFilter = f.value; applyFilter()"
+                  class="btn btn-sm"
+                  [style.background]="activeFilter === f.value ? 'var(--accent)' : 'rgba(255,255,255,0.04)'"
+                  [style.color]="activeFilter === f.value ? '#fff' : 'var(--text-3)'"
+                  [style.border]="activeFilter === f.value ? 'none' : '1px solid var(--border)'">
+            {{f.label}}
+          </button>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="loading">
+          <div style="display:flex;flex-direction:column;gap:1rem;">
+            <div *ngFor="let i of [1,2,3]" class="card" style="padding:1.5rem;">
+              <div style="display:flex;gap:12px;margin-bottom:12px;">
+
+                <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+                  <div class="skeleton" style="height:16px;width:65%;"></div>
+                  <div class="skeleton" style="height:12px;width:35%;"></div>
+                </div>
+              </div>
+              <div class="skeleton" style="height:12px;margin-bottom:8px;"></div>
+              <div class="skeleton" style="height:12px;width:80%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div *ngIf="!loading && filteredPosts.length > 0">
+          <div style="display:flex;flex-direction:column;gap:1rem;">
+            <article *ngFor="let post of filteredPosts" [routerLink]="['/post', post.id]" class="card card-interactive" style="padding:1.5rem;">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:10px;">
+                <div style="display:flex;gap:12px;align-items:flex-start;min-width:0;">
+
+                  <div style="min-width:0;">
+                    <h3 style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:4px;">
+                      <!-- Highlight matching text -->
+                      <span [innerHTML]="highlight(post.title)"></span>
+                    </h3>
+                    <div style="font-size:0.8125rem;color:var(--text-3);display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                      <span style="color:var(--text-2);">{{post.authorName}}</span>
+                      <div *ngIf="post.companyName" style="display:contents;">
+                        <span>·</span>
+                        <span style="color:#a78bfa;">{{post.companyName}}</span>
+                      </div>
+                      <span>·</span>
+                      <span>{{post.createdAt | date:'MMM d, y'}}</span>
+                    </div>
+                  </div>
+                </div>
+                <span *ngIf="post.result" class="badge"
+                      [class.badge-green]="post.result === 'Selected'"
+                      [class.badge-red]="post.result === 'Rejected'"
+                      [class.badge-amber]="post.result !== 'Selected' && post.result !== 'Rejected'">
+                  {{post.result}}
+                </span>
+              </div>
+
+              <p class="line-clamp-2" style="font-size:0.9rem;color:var(--text-3);line-height:1.6;">
+                <span [innerHTML]="highlight(post.content)"></span>
+              </p>
+
+              <div style="display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap;">
+                <span *ngIf="post.role" style="font-size:0.8125rem;color:var(--text-3);display:flex;align-items:center;gap:4px;">{{post.role}}</span>
+                <span *ngIf="post.difficulty" class="badge"
+                      [class.badge-green]="post.difficulty === 'Easy'"
+                      [class.badge-amber]="post.difficulty === 'Medium'"
+                      [class.badge-red]="post.difficulty === 'Hard'">{{post.difficulty}}</span>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- No results -->
+        <div *ngIf="!loading && query && filteredPosts.length === 0" class="card" style="padding:4rem;text-align:center;">
+          <h3 style="font-family:var(--font-display);font-size:1.25rem;font-weight:700;color:var(--text);margin-bottom:0.5rem;">No results found</h3>
+          <p style="color:var(--text-3);font-size:0.9375rem;">Try a different search term or browse the full feed.</p>
+          <a routerLink="/" class="btn btn-ghost" style="margin-top:1.5rem;display:inline-flex;">Browse All Posts</a>
+        </div>
+
+        <!-- Empty state (no query yet) -->
+        <div *ngIf="!loading && !query">
+          <div style="display:flex;flex-direction:column;gap:1rem;">
+            <p class="sidebar-section-title">Trending Searches</p>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              <button *ngFor="let t of trending" (click)="query = t; onSearch()" class="btn btn-ghost btn-sm">
+                {{t}}
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>

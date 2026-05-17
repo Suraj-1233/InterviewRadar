@@ -1,0 +1,229 @@
+    <app-nav></app-nav>
+
+    <div class="page-wrapper" style="background: var(--bg);">
+      <div class="container">
+        <div class="feed-layout">
+
+          <!-- ── Left Sidebar ─────────────────────────────────────────── -->
+          <aside class="sidebar-left" style="position: sticky; top: 88px; align-self: start;">
+            <div style="display:flex; flex-direction:column; gap:1.5rem;">
+
+              <!-- Companies from API -->
+              <div>
+                <p class="sidebar-section-title">Top Companies</p>
+                <div *ngIf="companyService.loading()">
+                  <div style="display:flex;flex-direction:column;gap:6px;">
+                    <div *ngFor="let i of [1,2,3,4,5]" class="skeleton" style="height:44px;border-radius:var(--r-md);"></div>
+                  </div>
+                </div>
+                <div *ngIf="!companyService.loading()">
+                  <div style="display:flex; flex-direction:column; gap:2px;">
+                    <div *ngFor="let company of companyService.companies()"
+                         class="sidebar-item"
+                         (click)="filterByCompany(company)"
+                         [style.background]="selectedCompany?.id === company.id ? 'var(--accent-soft)' : ''"
+                         [style.color]="selectedCompany?.id === company.id ? 'var(--text)' : ''">
+
+                      <div style="min-width:0;">
+                        <div style="font-weight:500;font-size:0.875rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                          {{company.name}}
+                        </div>
+                        <div style="font-size:0.7rem;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                          {{company.industry}}
+                        </div>
+                      </div>
+                    </div>
+                    <button *ngIf="selectedCompany" class="btn btn-ghost btn-sm" (click)="clearCompanyFilter()" style="margin-top:6px;width:100%;">
+                      Clear filter ✕
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div style="height:1px; background:var(--border);"></div>
+
+              <!-- Result Filter -->
+              <div>
+                <p class="sidebar-section-title">Filter by Result</p>
+                <div style="display:flex; flex-direction:column; gap:2px;">
+                  <div *ngFor="let f of resultFilters" class="sidebar-item" (click)="setFilter(f.value)"
+                       [style.color]="activeFilter === f.value ? 'var(--text)' : ''"
+                       [style.background]="activeFilter === f.value ? 'var(--accent-soft)' : ''">
+
+                    <span>{{f.label}}</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </aside>
+
+          <!-- ── Main Feed ────────────────────────────────────────────── -->
+          <main>
+            <!-- Header -->
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.75rem; flex-wrap:wrap; gap:1rem;">
+              <div>
+                <h1 class="section-heading" style="margin-bottom:4px;">Community Feed</h1>
+                <p style="font-size:0.9375rem; color:var(--text-3);">
+                  <span *ngIf="selectedCompany">
+                    Showing experiences for <span style="color:#a78bfa;font-weight:600;">{{selectedCompany.name}}</span>
+                  </span>
+                  <span *ngIf="!selectedCompany">
+                    Real interview experiences from the community
+                  </span>
+                </p>
+              </div>
+              <!-- Sort Toggle -->
+              <div style="display:flex; gap:4px; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:var(--r-md); padding:4px; flex-shrink:0;">
+                <button *ngFor="let s of sortOptions"
+                        (click)="setSort(s.value)"
+                        class="btn btn-sm"
+                        [style.background]="activeSort === s.value ? 'var(--brand)' : 'transparent'"
+                        [style.color]="activeSort === s.value ? '#fff' : 'var(--text-meta)'"
+                        style="border:none; padding:6px 14px;">
+                  {{s.label}}
+                </button>
+              </div>
+            </div>
+
+            <!-- Skeleton -->
+            <div *ngIf="postService.loading() && postService.posts().length === 0">
+              <div style="display:flex; flex-direction:column; gap:1rem;">
+                <div *ngFor="let i of [1,2,3]" class="card" style="padding:1.75rem;">
+                  <div style="display:flex; gap:14px; margin-bottom:1rem;">
+
+                    <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+                      <div class="skeleton" style="height:18px; width:60%;"></div>
+                      <div class="skeleton" style="height:14px; width:30%;"></div>
+                    </div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:8px;">
+                    <div class="skeleton" style="height:14px;"></div>
+                    <div class="skeleton" style="height:14px; width:80%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Post Cards -->
+            <div style="display:flex; flex-direction:column; gap:1rem;">
+              <article *ngFor="let post of postService.posts()" [routerLink]="['/post', post.id]" class="card card-interactive animate-fade-up" style="padding:1.75rem;">
+
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; margin-bottom:1rem;">
+                  <div style="display:flex; gap:14px; align-items:flex-start; min-width:0; flex:1;">
+
+                    <div style="min-width:0;">
+                      <h2 style="font-family:var(--font-display); font-size:1.0625rem; font-weight:700; color:var(--text); letter-spacing:-0.02em; margin-bottom:4px; line-height:1.3;">
+                        {{post.title}}
+                      </h2>
+                      <div style="display:flex; align-items:center; gap:6px; font-size:0.8125rem; color:var(--text-3); flex-wrap:wrap;">
+                        <span [style.fontStyle]="post.anonymous ? 'italic' : ''" style="color:var(--text-2);">{{post.authorName}}</span>
+                        <div *ngIf="post.companyName" style="display:contents;">
+                          <span style="color:var(--border-hover);">·</span>
+                          <span style="color:#a78bfa;">{{post.companyName}}</span>
+                        </div>
+                        <span style="color:var(--border-hover);">·</span>
+                        <span>{{post.createdAt | date:'MMM d'}}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="post.result">
+                    <span class="badge"
+                          [class.badge-success]="post.result === 'Selected'"
+                          [class.badge-error]="post.result === 'Rejected'"
+                          [class.badge-warning]="post.result === 'Pending' || post.result === 'Waitlisted'">
+                      {{post.result}}
+                    </span>
+                  </div>
+                </div>
+
+                <p class="line-clamp-2" style="font-size:0.9375rem; color:var(--text-3); line-height:1.65; margin-bottom:1.25rem;">
+                  {{post.content}}
+                </p>
+
+                <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding-top:1.125rem; border-top:1px solid var(--border);">
+                  <span *ngIf="post.role" style="font-size:0.8125rem; color:var(--text-3); display:flex; align-items:center; gap:5px;">
+                    {{post.role}}
+                  </span>
+                  <div *ngIf="post.difficulty" style="display:contents;">
+                    <span class="badge"
+                          [class.badge-success]="post.difficulty === 'Easy'"
+                          [class.badge-warning]="post.difficulty === 'Medium'"
+                          [class.badge-error]="post.difficulty === 'Hard'">
+                      {{post.difficulty}}
+                    </span>
+                  </div>
+                  <span *ngIf="post.location" style="font-size:0.8125rem; color:var(--text-3); display:flex; align-items:center; gap:5px;">
+                    {{post.location}}
+                  </span>
+                  <span style="margin-left:auto; font-size:0.8125rem; color:var(--text-3); display:flex; align-items:center; gap:5px;">
+                    {{post.viewCount || 0}}
+                  </span>
+                </div>
+
+              </article>
+            </div>
+
+            <!-- Empty state -->
+            <div *ngIf="!postService.loading() && postService.posts().length === 0" style="text-align:center;padding:4rem 0;">
+              <p style="color:var(--text-3);font-size:1rem;">No experiences found.</p>
+            </div>
+
+            <!-- Load More -->
+            <button *ngIf="postService.hasMore()" (click)="loadMore()" class="btn btn-ghost" [disabled]="postService.loading()"
+                    style="width:100%; margin-top:1.5rem; padding:14px;">
+              {{ postService.loading() ? 'Loading…' : 'Load More Experiences' }}
+            </button>
+          </main>
+
+          <!-- ── Right Sidebar ─────────────────────────────────────────── -->
+          <aside class="sidebar-right" style="position:sticky; top:88px; align-self:start; display:flex; flex-direction:column; gap:1.5rem;">
+
+            <!-- Company Detail Card -->
+            <div *ngIf="selectedCompany">
+              <div class="card animate-fade-up" style="padding:1.5rem;">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;">
+
+                  <div>
+                    <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text);">{{selectedCompany.name}}</div>
+                    <div style="font-size:0.75rem;color:var(--text-3);">{{selectedCompany.industry}}</div>
+                  </div>
+                </div>
+                <p *ngIf="selectedCompany.description" style="font-size:0.875rem;color:var(--text-3);line-height:1.6;margin-bottom:1rem;">{{selectedCompany.description}}</p>
+                <div *ngIf="selectedCompany.headquarters" style="display:flex;align-items:center;gap:6px;font-size:0.8125rem;color:var(--text-3);margin-bottom:0.75rem;">
+                  {{selectedCompany.headquarters}}
+                </div>
+                <a *ngIf="selectedCompany.websiteUrl" [href]="selectedCompany.websiteUrl" target="_blank" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;">
+                  Visit Website ↗
+                </a>
+              </div>
+            </div>
+
+            <!-- Platform Stats -->
+            <div class="card" style="padding:1.25rem;">
+              <p class="sidebar-section-title" style="margin-bottom:1rem;">Platform Stats</p>
+              <div style="display:flex; flex-direction:column; gap:1rem;">
+                <div *ngFor="let stat of stats" style="display:flex; align-items:center; gap:12px;">
+
+                  <div>
+                    <div style="font-family:var(--font-display);font-size:1.125rem;font-weight:700;color:var(--text);letter-spacing:-0.02em;">{{stat.value}}</div>
+                    <div style="font-size:0.75rem;color:var(--text-3);">{{stat.label}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="card" style="padding:1.25rem;">
+              <p class="sidebar-section-title" style="margin-bottom:0.75rem;">Share Your Story</p>
+              <p style="font-size:0.875rem;color:var(--text-3);margin-bottom:1rem;line-height:1.55;">Help others by sharing your interview journey.</p>
+              <a routerLink="/post/create" class="btn btn-primary" style="width:100%;justify-content:center;">
+                + Write Experience
+              </a>
+            </div>
+
+          </aside>
+
+        </div>
+      </div>
+    </div>
